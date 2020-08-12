@@ -284,6 +284,6 @@ def format_to_lines(args):
 
 def _format_to_lines(f, corpus_type, args):
     source, tgt = load_json(f)
-    id = re.sub(args.token_path + '\\\\' + corpus_type + '.', '', f)
+    id = re.sub(args.token_path[:-1] + '\\\\' + corpus_type + '.', '', f)
     id = re.sub('.story.json', '', id)
     return {'src': source, 'tgt': tgt, 'id': id}

@@ -118,9 +118,6 @@ def wait_and_validate(args, device_id):
             break
     total_loss_lst = sorted(total_loss_lst, key=lambda x: x[0])[:3]
     logger.info('PPL %s' % str(total_loss_lst))
-    for xent, cp in total_loss_lst:
-        step = int(cp.split('.')[-2].split('_')[-1])
-        test(args, device_id, cp, step, is_valid=True)
 
 
 def validate(args, device_id, pt, step):
@@ -177,7 +174,7 @@ def test(args, device_id, pt, step, is_valid=False):
                                                shuffle=False, is_test=True)
             stats = trainer.test(test_iter, step, 'test', id)
     else:
-        corpus_list = ['test']
+        corpus_list = ['train', 'valid', 'test']
         if is_valid:
             corpus_list = ['valid']
         for corpus_type in corpus_list:

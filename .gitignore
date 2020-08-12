@@ -3,3 +3,5 @@
 /models/
 /logs/
 /result_summary/
+/temp/
+/.idea
