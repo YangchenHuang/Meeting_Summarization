@@ -146,7 +146,7 @@ class Translator(object):
                     if corpus_type == 'test':
                         summary_path = self.args.summary_path + '%d.%s.summary' % (step, id)
                         with open(summary_path, 'w', encoding='utf-8') as f:
-                            f.write(pred_str.replace('<q>', ''))
+                            f.write(pred_str.replace('<q>', ' '))
                     if not self.args.test_txt:
                         self.can_out_file.write(pred_str + '\n')
                         self.gold_out_file.write(gold_str + '\n')
