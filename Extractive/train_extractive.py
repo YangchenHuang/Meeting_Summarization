@@ -303,10 +303,11 @@ if __name__ == '__main__':
     device = "cpu" if args.world_size == 0 else "cuda"
     device_id = 0 if device == "cuda" else -1
 
-    if args.world_size > 1:
-        multi_main(args)
-    elif args.mode == 'train':
-        train(args, device_id)
+    if args.mode == 'train':
+        if args.world_size > 1:
+            multi_main(args)
+        else:
+            train(args, device_id)
     elif args.mode == 'validate':
         wait_and_validate(args, device_id)
     elif args.mode == 'test':

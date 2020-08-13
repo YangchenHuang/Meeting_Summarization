@@ -389,7 +389,6 @@ if __name__ == '__main__':
         args.gpu_ranks = ','.join(args.gpu_ranks)
     if args.gpu_ranks != '':
         args.gpu_ranks = [int(i) for i in args.gpu_ranks.split(',')]
-    args.gpu_ranks = [int(i) for i in range(len(args.visible_gpus.split(',')))]
     os.environ["CUDA_VISIBLE_DEVICES"] = args.visible_gpus
 
     init_logger(args.log_file)
