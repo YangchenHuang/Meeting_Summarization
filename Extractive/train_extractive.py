@@ -166,7 +166,7 @@ def test(args, device_id, pt, step, is_valid=False):
     if args.test_txt:
         pts = sorted(glob.glob(args.bert_data_path + '*.pt'))
         for pt in pts:
-            id = re.sub(args.bert_data_path[:-1] + '\\\\test.', '', pt)
+            id = re.sub(args.bert_data_path + 'test.', '', pt)
             id = re.sub('.bert.pt', '', id)
             test_iter = data_loader.Dataloader(args, load_test(pt, 'test'),
                                                args.test_batch_size, device,
@@ -182,7 +182,7 @@ def test(args, device_id, pt, step, is_valid=False):
                 rouge_stat[type] = []
             pts = sorted(glob.glob(args.bert_data_path + corpus_type + '*.pt'))
             for pt in pts:
-                id = re.sub(args.bert_data_path[:-1] + '\\\\' + corpus_type + '.', '', pt)
+                id = re.sub(args.bert_data_path + corpus_type + '.', '', pt)
                 id = re.sub('.bert.pt', '', id)
                 test_iter = data_loader.Dataloader(args, load_test(pt, corpus_type),
                                                    args.test_batch_size, device,
