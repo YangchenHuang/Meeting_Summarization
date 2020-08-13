@@ -256,7 +256,7 @@ class Trainer(object):
                                     save_pred.write('<q> ' + pred[i][1].strip())
                     save_gold.write(gold_summary)
                 for sent in gold_summary.split('<q>'):
-                    save_story.write('\n\n@highlight\n\n{}'.format(sent + '.'))
+                    save_story.write('\n\n@highlight\n\n{}'.format(sent))
         if self.args.test_txt:
             return stats
         else:

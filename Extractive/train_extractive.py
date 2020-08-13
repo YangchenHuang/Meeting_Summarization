@@ -167,10 +167,10 @@ def test(args, device_id, pt, step, is_valid=False):
     if args.test_txt:
         pts = sorted(glob.glob(args.bert_data_path + '*.pt'))
         for pt in pts:
-            id = re.sub(args.bert_data_path + 'test.', '', pt)
+            id = re.sub(args.bert_data_path[:-1] + '\\\\test.', '', pt)
             id = re.sub('.bert.pt', '', id)
             test_iter = data_loader.Dataloader(args, load_test(pt, 'test'),
-                                               args.batch_size, device,
+                                               args.test_batch_size, device,
                                                shuffle=False, is_test=True)
             stats = trainer.test(test_iter, step, 'test', id)
     else:
@@ -183,10 +183,10 @@ def test(args, device_id, pt, step, is_valid=False):
                 rouge_stat[type] = []
             pts = sorted(glob.glob(args.bert_data_path + corpus_type + '*.pt'))
             for pt in pts:
-                id = re.sub(args.bert_data_path + corpus_type + '.', '', pt)
+                id = re.sub(args.bert_data_path[:-1] + '\\\\' + corpus_type + '.', '', pt)
                 id = re.sub('.bert.pt', '', id)
                 test_iter = data_loader.Dataloader(args, load_test(pt, corpus_type),
-                                                   args.batch_size, device,
+                                                   args.test_batch_size, device,
                                                    shuffle=False, is_test=True)
                 stats, rouges = trainer.test(test_iter, step, corpus_type, id)
                 for type in rouge_list:
@@ -262,6 +262,7 @@ if __name__ == '__main__':
     parser.add_argument("-temp_dir", default='../temp/')
 
     parser.add_argument("-batch_size", default=1000, type=int)
+    parser.add_argument("-test_batch_size", default=20000, type=int)
     parser.add_argument("-use_interval", type=str2bool, nargs='?', const=False, default=False)
     parser.add_argument("-ff_size", default=512, type=int, help='feed forward network hidden size')
     parser.add_argument("-heads", default=16, type=int)

@@ -100,9 +100,10 @@ def segmentation_story(corpus, summary, args, ids=None, type='all'):
                 for my_label in [sent[0] for j, sent in enumerate(utterances_processed) if membership[j] == label]:
                     selected = [elt for elt in utterances_indexed if elt[0] == my_label][0]
                     output_index.append(selected[0])
-                    to_write =selected[1]
+                    to_write = selected[1]
                     story_file.write(to_write + '. \n')
                 for sent in summ:
+                    sent = sent + '.'
                     story_file.write('@highlight {}\n'.format(sent))
                 story_file.write('\n')
             with open(path_to_index + id + '.' + str(i) + '.index', 'w+') as index_file:
