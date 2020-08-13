@@ -273,6 +273,7 @@ def format_to_lines(args):
         count = 0
         if len(data[i]) == 0:
             continue
+        data[i].sort(key=lambda x: x[0])
         for id, f in data[i]:
             d = _format_to_lines(f, id, corpus_type, index_path)
             id = re.sub('\.\d+', '', id)

@@ -16,17 +16,17 @@ filler_words = utils.load_filler_words(path_to_filler_words)
 
 def process_corpus(type='story'):
     if type == 'story':
-        path = '../raw_data/transcript/'+'*'+'transcript.txt'
+        path = args.transcript_path+'*'+'transcript.txt'
     elif type == 'txt':
-        path = '../txt_data/'+'*'+'.txt'
+        path = args.txt_path+'*'+'.txt'
     corpus = {}
     for text in glob.glob(path):
         f = open(text, "r").read()
         if type == 'story':
-            id = re.sub('../raw_data/transcript\\\\', '', text)
+            id = re.sub(args.transcript_path, '', text)
             id = re.sub('.transcript.txt', '', id)
         elif type == 'txt':
-            id = re.sub('../txt_data\\\\', '', text)
+            id = re.sub(args.txt_path, '', text)
             id = re.sub('.txt', '', id)
         raw = re.split('\. |\? |\! |\; ', f)
         utterances = []
@@ -45,9 +45,9 @@ def process_corpus(type='story'):
 
 def process_summary():
     summary = {}
-    for text in glob.glob('../raw_data/summary/' + '*' + 'abssumm.txt'):
+    for text in glob.glob(args.summary_path + '*' + 'abssumm.txt'):
         f = open(text, "r").read()
-        id = re.sub('../raw_data/summary\\\\', '', text)
+        id = re.sub(args.summary_path, '', text)
         id = re.sub('.abssumm.txt', '', id)
         raw = re.split('\. |\? |\! |\; ', f)
         utterances = []
@@ -87,8 +87,8 @@ def segmentation_story(corpus, summary, args, ids=None, type='all'):
         c = dict(Counter(membership))
         comm_labels = [k for k, v in c.items()]
 
-        path_to_community = '../ext_data/story/' + type + '/'
-        path_to_index = '../ext_data/index/' + type + '/'
+        path_to_community = args.story_path + type + '/'
+        path_to_index = args.index_path + type + '/'
         if not os.path.exists(path_to_community):
             os.makedirs(path_to_community)
         if not os.path.exists(path_to_index):
@@ -132,10 +132,10 @@ def segmentation_txt(corpus, args):
         c = dict(Counter(membership))
         comm_labels = [k for k, v in c.items()]
 
-        path_to_community = '../ext_data/text/test/'
+        path_to_community = args.txt_out_path + 'test/'
         if not os.path.exists(path_to_community):
             os.makedirs(path_to_community)
-        path_to_index = '../ext_data/index/test/'
+        path_to_index = args.index_path + 'test/'
         if not os.path.exists(path_to_index):
             os.makedirs(path_to_index)
         for i, label in enumerate(comm_labels):
@@ -158,6 +158,12 @@ if __name__ == '__main__':
     parser.add_argument('-mode', type=str, default='story', choices=['story', 'txt'], help='output format')
     parser.add_argument('-split', type=bool, default=True, help='whether need train test split')
     parser.add_argument('-seed', type=int, default=2020, help='random seed for split')
+    parser.add_argument("-transcript_path", default='../raw_data/transcript/')
+    parser.add_argument("-summary_path", default='../raw_data/summary/')
+    parser.add_argument("-txt_path", default='../txt_data/')
+    parser.add_argument("-index_path", default='../ext_data/index/')
+    parser.add_argument("-story_path", default='../ext_data/story/')
+    parser.add_argument("-txt_out_path", default='../ext_data/text/')
     parser.add_argument('-algorithm', type=str, default='ec', choices=['ec', 'kmeans'],
                         help='clustering algorithm: equal size cluster or kmeans')
     parser.add_argument('-n_gram', type=str, default='1, 1',
