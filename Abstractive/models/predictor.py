@@ -6,7 +6,7 @@ import torch
 
 from tensorboardX import SummaryWriter
 
-from others.utils import rouge_results_to_str, test_rouge, tile
+from others.utils import rouge_results_to_str, calculate_rouge, tile
 from translate.beam import GNMTGlobalScorer
 
 
@@ -89,9 +89,7 @@ class Translator(object):
         translations = []
         for b in range(batch_size):
             pred_ids = [int(n) for n in preds[b][0]]
-            print(pred_ids)
             pred_sents = self.vocab.decode(pred_ids)
-            print(pred_sents)
             gold_sent = ' '.join(tgt_str[b].split())
             raw_src = self.vocab.decode([int(t) for t in src[b]])
             raw_src = ' '.join(raw_src)
@@ -137,7 +135,7 @@ class Translator(object):
                                        '\[unused9\]', '\[unused10\]', '\[unused11\]', '\[unused12\]', '\[unused13\]',
                                        '\[unused14\]']:
                             pred = re.sub(unused + '.*', '', pred)
-                        pred_str = pred.replace('[unucsed0]', '').replace('[unused3]', '').replace('[PAD]', '') \
+                        pred_str = pred.replace('[unused0]', '').replace('[unused3]', '').replace('[PAD]', '') \
                             .replace(r' +', ' ').replace(' [unused2] ', '<q>').replace('[unused2]', '').strip()
                     pred_str = re.sub('\\b(\\w+)\\s+\\1\\b', '\\1', pred_str)
                     pred_str = re.sub('(\\b.+?\\b)\\1\\b', '\\1', pred_str)
@@ -165,7 +163,7 @@ class Translator(object):
 
         rouges = {}
         if not self.args.test_txt:
-            rouges = self._report_rouge(gold_path, can_path)
+            rouges = self._report_rouge(can_path, gold_path)
             self.logger.info('Rouges at step %d \n%s' % (step, rouge_results_to_str(rouges)))
             if self.tensorboard_writer is not None:
                 self.tensorboard_writer.add_scalar('test/rouge1-F', rouges['rouge_1_f_score'], step)
@@ -173,9 +171,9 @@ class Translator(object):
                 self.tensorboard_writer.add_scalar('test/rougeL-F', rouges['rouge_l_f_score'], step)
         return rouges
 
-    def _report_rouge(self, gold_path, can_path):
+    def _report_rouge(self, can_path, gold_path):
         self.logger.info("Calculating Rouge")
-        results_dict = test_rouge(self.args.temp_dir, can_path, gold_path)
+        results_dict = calculate_rouge(can_path, gold_path)
         return results_dict
 
     def translate_batch(self, batch, max_length, min_length=0):

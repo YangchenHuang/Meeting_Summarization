@@ -33,7 +33,7 @@ def str2bool(v):
 
 def train_abs_multi(args):
     """ Spawns 1 process per GPU """
-    init_logger()
+    init_logger(args.log_file)
 
     nb_gpu = args.world_size
     mp = torch.multiprocessing.get_context('spawn')
@@ -145,7 +145,7 @@ def validate_abs(args, device_id):
 
 
 def validate(args, device_id, pt, step):
-    device = "cpu" if args.visible_gpus == '-1' else "cuda"
+    device = "cpu" if args.world_size == 0 else "cuda"
     if (pt != ''):
         test_from = pt
     else:
@@ -198,7 +198,7 @@ def validate(args, device_id, pt, step):
 
 
 def test_abs(args, device_id, pt, step):
-    device = "cpu" if args.visible_gpus == '-1' else "cuda"
+    device = "cpu" if args.world_size == 0 else "cuda"
     if (pt != ''):
         test_from = pt
     else:
@@ -250,7 +250,7 @@ def train_abs(args, device_id):
 def train_abs_single(args, device_id):
     init_logger(args.log_file)
     logger.info(str(args))
-    device = "cpu" if args.visible_gpus == '-1' else "cuda"
+    device = "cpu" if args.world_size == 0 else "cuda"
     logger.info('Device ID %d' % device_id)
     logger.info('Device %s' % device)
     torch.manual_seed(args.seed)
@@ -369,9 +369,10 @@ if __name__ == '__main__':
     parser.add_argument("-train_steps", default=2000, type=int)
     parser.add_argument("-validate_rouge", type=str2bool, nargs='?', const=True, default=True)
 
-    parser.add_argument('-visible_gpus', default='0', type=str)
-    parser.add_argument('-gpu_ranks', default='0', type=str)
-    parser.add_argument('-log_file', default='../logs/abstract.log')
+    parser.add_argument("-world_size", default=1, type=int, help='gpu world size, 0 if cpu')
+    parser.add_argument('-visible_gpus', default='', type=str)
+    parser.add_argument('-gpu_ranks', default='', type=str)
+    parser.add_argument('-log_file', default='../logs/abstractive.log')
     parser.add_argument('-seed', default=666, type=int)
 
     parser.add_argument("-test_from", default='')
@@ -380,12 +381,19 @@ if __name__ == '__main__':
     parser.add_argument("-block_trigram", type=str2bool, nargs='?', const=True, default=True)
 
     args = parser.parse_args()
+    if args.visible_gpus == '' and args.world_size != 0:
+        args.visble_gpus = [str(i) for i in range(args.world_size)]
+        args.visble_gpus = ','.join(args.visble_gpus)
+    if args.gpu_ranks == '' and args.world_size != 0:
+        args.gpu_ranks = [str(i) for i in range(args.world_size)]
+        args.gpu_ranks = ','.join(args.gpu_ranks)
+    if args.gpu_ranks != '':
+        args.gpu_ranks = [int(i) for i in args.gpu_ranks.split(',')]
     args.gpu_ranks = [int(i) for i in range(len(args.visible_gpus.split(',')))]
-    args.world_size = len(args.gpu_ranks)
     os.environ["CUDA_VISIBLE_DEVICES"] = args.visible_gpus
 
     init_logger(args.log_file)
-    device = "cpu" if args.visible_gpus == '-1' else "cuda"
+    device = "cpu" if args.world_size == 0 else "cuda"
     device_id = 0 if device == "cuda" else -1
 
     if args.mode == 'train':

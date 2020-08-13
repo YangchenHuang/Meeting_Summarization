@@ -7,7 +7,7 @@ import distributed
 from models.reporter import ReportMgr
 from models.stats import Statistics
 from others.logging import logger
-from others.utils import test_rouge, get_candidate_rouge, rouge_results_to_str
+from others.utils import calculate_rouge, rouge_results_to_str
 
 
 def _tally_parameters(model):
@@ -249,18 +249,18 @@ class Trainer(object):
                             gold_summary = (batch.tgt_str[0].strip())
                             pred.sort(key=lambda x: x[0])
                             for i in range(len(pred)):
-                                save_story.write(pred[i][1].strip() + ' ')
+                                save_story.write(pred[i][1].strip() + '\n')
                                 if i == 0:
                                     save_pred.write(pred[i][1].strip())
                                 else:
                                     save_pred.write('<q> ' + pred[i][1].strip())
                     save_gold.write(gold_summary)
                 for sent in gold_summary.split('<q>'):
-                    save_story.write('\n\n@highlight\n\n{}'.format(sent))
+                    save_story.write('@highlight {}\n'.format(sent))
         if self.args.test_txt:
             return stats
         else:
-            rouges = test_rouge(self.args.temp_dir, can_path, gold_path)
+            rouges = calculate_rouge(can_path, gold_path)
             logger.info('Rouges at step %d \n%s' % (step, rouge_results_to_str(rouges)))
             self._report_step(0, step, valid_stats=stats)
             return stats, rouges

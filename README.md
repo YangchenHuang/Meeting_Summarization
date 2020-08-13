@@ -8,7 +8,7 @@ Meeting summarization combining abstractive and extractive methods.
 
 ## Models Used:
 
-[Bert](https://arxiv.org/abs/1810.04805)
+[Bert](https://arxiv.org/abs/1810.04805)  
 [Longformer](https://arxiv.org/abs/2004.05150)
 
 ## Citation
@@ -17,4 +17,5 @@ Meeting summarization combining abstractive and extractive methods.
 
 ## How to use 
 
-Simply run the jupyter notebook to train the model on AMI dataset and test your own meeting file.
+Simply run the jupyter notebook to train the model on AMI dataset and test your own meeting file.  
+Check the readme file of each component to learn the functionality.

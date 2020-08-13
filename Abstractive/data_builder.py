@@ -13,85 +13,22 @@ from transformers import LongformerTokenizer
 from others.utils import clean
 
 
-def _get_ngrams(n, text):
-    """Calcualtes n-grams.
-
-    Args:
-      n: which n-grams to calculate
-      text: An array of tokens
-
-    Returns:
-      A set of n-grams
-    """
-    ngram_set = set()
-    text_length = len(text)
-    max_index_ngram_start = text_length - n
-    for i in range(max_index_ngram_start + 1):
-        ngram_set.add(tuple(text[i:i + n]))
-    return ngram_set
-
-
-def _get_word_ngrams(n, sentences):
-    """Calculates word n-grams for multiple sentences.
-    """
-    assert len(sentences) > 0
-    assert n > 0
-
-    words = sum(sentences, [])
-
-    return _get_ngrams(n, words)
-
-
-def load_json(p):
-    source = []
+def load_story(p):
+    src = []
     tgt = []
-    flag = False
-    for sent in json.load(open(p))['sentences']:
-        tokens = [t['word'] for t in sent['tokens']]
-        if tokens[0] == '@highlight':
-            flag = True
-            tgt.append([])
-            continue
-        if (flag):
-            tgt[-1].extend(tokens)
-        else:
-            source.append(tokens)
+    with open(p, 'r+') as f:
+        for sent in f.readlines():
+            tokens = sent.split()
+            if len(tokens) > 0:
+                if tokens[0] == '@highlight':
+                    tokens.pop(0)
+                    tgt.append(tokens)
+                else:
+                    src.append(tokens)
 
-    source = [clean(' '.join(sent)).split() for sent in source]
+    src = [clean(' '.join(sent)).split() for sent in src]
     tgt = [clean(' '.join(sent)).split() for sent in tgt]
-    return source, tgt
-
-
-def tokenize(args):
-    stories_dir = args.raw_path
-    tokenized_stories_dir = args.token_path
-    if not os.path.exists(tokenized_stories_dir):
-        os.makedirs(tokenized_stories_dir)
-    print("Preparing to tokenize %s to %s..." % (stories_dir, tokenized_stories_dir))
-    stories = os.listdir(stories_dir)
-    # make IO list file
-    print("Making list of files to tokenize...")
-    with open("mapping_for_corenlp.txt", "w") as f:
-        for s in stories:
-            if not s.endswith('story'):
-                continue
-            f.write("%s\n" % (os.path.join(stories_dir, s)))
-    command = ['java', 'edu.stanford.nlp.pipeline.StanfordCoreNLP', '-annotators', 'tokenize,ssplit',
-               '-ssplit.newlineIsSentenceBreak', 'always', '-filelist', 'mapping_for_corenlp.txt', '-outputFormat',
-               'json', '-outputDirectory', tokenized_stories_dir]
-    print("Tokenizing %i files in %s and saving in %s..." % (len(stories), stories_dir, tokenized_stories_dir))
-    subprocess.call(command)
-    print("Stanford CoreNLP Tokenizer has finished.")
-    os.remove("mapping_for_corenlp.txt")
-
-    # Check that the tokenized stories directory contains the same number of files as the original directory
-    num_orig = len(os.listdir(stories_dir))
-    num_tokenized = len(os.listdir(tokenized_stories_dir))
-    if num_orig != num_tokenized:
-        raise Exception(
-            "The tokenized stories directory %s contains %i files, but it should contain the same number as %s (which has %i files). Was there an error during tokenization?" % (
-                tokenized_stories_dir, num_tokenized, stories_dir, num_orig))
-    print("Successfully finished tokenizing %s to %s.\n" % (stories_dir, tokenized_stories_dir))
+    return src, tgt
 
 
 class LongformerData():
@@ -127,8 +64,6 @@ class LongformerData():
         tgt_subtoken = tgt_subtokens_str.split()
         tgt_subtoken_idxs = self.tokenizer.convert_tokens_to_ids(tgt_subtoken)
 
-        print(tgt_subtokens_str)
-        print(tgt_subtoken_idxs)
         tgt_txt = '<q>'.join([' '.join(tt) for tt in tgt])
         src_txt = [original_src_txt[i] for i in idxs]
         return src_subtoken_idxs, tgt_subtoken_idxs, src_txt, tgt_txt
@@ -142,7 +77,7 @@ def format_to_longformer(args):
     for corpus_type in datasets:
         a_lst = []
         for json_f in glob.glob(pjoin(json_path, '*' + corpus_type + '.*.json')):
-            real_name = json_f.split('/')[-1]
+            real_name = json_f.split('\\')[-1]
             a_lst.append((corpus_type, json_f, args, pjoin(args.long_path, real_name.replace('json', 'pt'))))
         for a in a_lst:
             _format_to_longformer(a)
@@ -197,7 +132,6 @@ class BertData():
 
         src_txt = [' '.join(sent) for sent in src]
         text = ' {} {} '.format(self.sep_token, self.cls_token).join(src_txt)
-
         src_subtokens = self.tokenizer.tokenize(text)
 
         src_subtokens = [self.cls_token] + src_subtokens + [self.sep_token]
@@ -223,7 +157,7 @@ def format_to_bert(args):
     for corpus_type in datasets:
         a_lst = []
         for json_f in glob.glob(pjoin(json_path, '*' + corpus_type + '.*.json')):
-            real_name = json_f.split('/')[-1]
+            real_name = json_f.split('\\')[-1]
             a_lst.append((corpus_type, json_f, args, pjoin(args.bert_path, real_name.replace('json', 'pt'))))
         for a in a_lst:
             _format_to_bert(a)
@@ -252,12 +186,13 @@ def _format_to_bert(params):
 
 
 def format_to_lines(args):
-    token_path = args.token_path
+    # stanfordnlp.download('en')
+    story_path = args.story_path
     if not os.path.exists(args.json_path):
         os.makedirs(args.json_path)
-    train_files = glob.glob(token_path + '/train' + '*.story.json')
-    valid_files = glob.glob(token_path + '/valid' + '*.story.json')
-    test_files = glob.glob(token_path + '/test' + '*.story.json')
+    train_files = glob.glob(story_path + '/train' + '*.story')
+    valid_files = glob.glob(story_path + '/valid' + '*.story')
+    test_files = glob.glob(story_path + '/test' + '*.story')
 
     corpus = {'train': train_files, 'valid': valid_files, 'test': test_files}
     for corpus_type in ['train', 'valid', 'test']:
@@ -283,7 +218,7 @@ def format_to_lines(args):
 
 
 def _format_to_lines(f, corpus_type, args):
-    source, tgt = load_json(f)
-    id = re.sub(args.token_path + corpus_type + '.', '', f)
-    id = re.sub('.story.json', '', id)
+    source, tgt = load_story(f)
+    id = re.sub(args.story_path[:-1]+'\\\\' + corpus_type + '.', '', f)
+    id = re.sub('.story', '', id)
     return {'src': source, 'tgt': tgt, 'id': id}
