@@ -318,13 +318,13 @@ def train_abs_single(args, device_id):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-encoder", default='longformer', type=str, choices=['bert', 'longformer'])
+    parser.add_argument("-encoder", default='bert', type=str, choices=['bert', 'longformer'])
     parser.add_argument("-mode", default='train', type=str, choices=['train', 'validate', 'test'])
     parser.add_argument("-test_txt", type=str2bool, nargs='?', const=False,
                         default=False)  # remember to reset all paths
 
-    parser.add_argument("-data_path", default='../abs_data/bert_data')
-    parser.add_argument("-model_path", default='../models/abstract')
+    parser.add_argument("-data_path", default='../abs_data/bert_data/')
+    parser.add_argument("-model_path", default='../models/abstract/')
     parser.add_argument("-result_path", default='../abs_data/result/')
     parser.add_argument("-summary_path", default='../result_summary/')
     parser.add_argument("-temp_dir", default='../temp')

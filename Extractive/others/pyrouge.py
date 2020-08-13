@@ -11,8 +11,7 @@ from functools import partial
 
 from configparser import ConfigParser
 
-from pyrouge.utils import log
-from pyrouge.utils.file_utils import verify_dir
+from others import logging
 
 
 REMAP = {"-lrb-": "(", "-rrb-": ")", "-lcb-": "{", "-rcb-": "}",
@@ -36,7 +35,7 @@ class DirectoryProcessor:
         """
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-        logger = log.get_global_console_logger()
+        logger = logging.get_global_console_logger()
         # logger.info("Processing files in {}.".format(input_dir))
         input_file_names = os.listdir(input_dir)
         for input_file_name in input_file_names:
@@ -113,7 +112,7 @@ class Rouge155(object):
 
         """
         self.temp_dir=temp_dir
-        self.log = log.get_global_console_logger()
+        self.log = logging.get_global_console_logger()
         self.__set_dir_properties()
         self._config_file = None
         self._settings_file = self.__get_config_path()
@@ -201,7 +200,6 @@ class Rouge155(object):
     @config_file.setter
     def config_file(self, path):
         config_dir, _ = os.path.split(path)
-        verify_dir(config_dir, "configuration file")
         self._config_file = path
 
     def split_sentences(self):
@@ -210,9 +208,10 @@ class Rouge155(object):
         are not already split, this method can be used.
 
         """
-        from pyrouge.utils.sentence_splitter import PunktSentenceSplitter
+        from rouge import Rouge
+        r = Rouge()
         self.log.info("Splitting sentences.")
-        ss = PunktSentenceSplitter()
+        ss = r.split_into_sentences()
         sent_split_to_string = lambda s: "\n".join(ss.split(s))
         process_func = partial(
             DirectoryProcessor.process, function=sent_split_to_string)
@@ -341,7 +340,6 @@ class Rouge155(object):
             config_filename = "rouge_conf.xml"
         else:
             config_dir, config_filename = os.path.split(config_file_path)
-            verify_dir(config_dir, "configuration file")
         self._config_file = os.path.join(self._config_dir, config_filename)
         Rouge155.write_config_static(
             self._system_dir, self._system_filename_pattern,
@@ -580,7 +578,6 @@ class Rouge155(object):
             return getattr(self, private_name)
 
         def fset(self, path):
-            verify_dir(path, dir_name)
             setattr(self, private_name, path)
 
         p = property(fget=fget, fset=fset, doc=docstring)

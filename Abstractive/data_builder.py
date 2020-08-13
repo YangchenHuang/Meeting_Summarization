@@ -142,7 +142,7 @@ def format_to_longformer(args):
     for corpus_type in datasets:
         a_lst = []
         for json_f in glob.glob(pjoin(json_path, '*' + corpus_type + '.*.json')):
-            real_name = json_f.split('\\')[-1]
+            real_name = json_f.split('/')[-1]
             a_lst.append((corpus_type, json_f, args, pjoin(args.long_path, real_name.replace('json', 'pt'))))
         for a in a_lst:
             _format_to_longformer(a)
@@ -223,7 +223,7 @@ def format_to_bert(args):
     for corpus_type in datasets:
         a_lst = []
         for json_f in glob.glob(pjoin(json_path, '*' + corpus_type + '.*.json')):
-            real_name = json_f.split('\\')[-1]
+            real_name = json_f.split('/')[-1]
             a_lst.append((corpus_type, json_f, args, pjoin(args.bert_path, real_name.replace('json', 'pt'))))
         for a in a_lst:
             _format_to_bert(a)
@@ -284,6 +284,6 @@ def format_to_lines(args):
 
 def _format_to_lines(f, corpus_type, args):
     source, tgt = load_json(f)
-    id = re.sub(args.token_path[:-1] + '\\\\' + corpus_type + '.', '', f)
+    id = re.sub(args.token_path + corpus_type + '.', '', f)
     id = re.sub('.story.json', '', id)
     return {'src': source, 'tgt': tgt, 'id': id}

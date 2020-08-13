@@ -221,7 +221,7 @@ def format_to_bert(args):
     for corpus_type in datasets:
         a_lst = []
         for json_f in glob.glob(pjoin(args.json_path, '*' + corpus_type + '.*.json')):
-            real_name = json_f.split('\\')[-1]
+            real_name = json_f.split('/')[-1]
             a_lst.append((json_f, args, pjoin(args.bert_path, real_name.replace('json', 'bert.pt'))))
         for a in a_lst:
             _format_to_bert(a)
@@ -264,7 +264,7 @@ def format_to_lines(args):
         if len(files) == 0:
             continue
         for f in files:
-            id = re.sub(args.story_path + corpus_type+ '\\\\', '', f)
+            id = re.sub(args.story_path + corpus_type + '/', '', f)
             id = re.sub('.story', '', id)
             data[i].append((id, f))
     for i, corpus_type in enumerate(['train', 'valid', 'test']):

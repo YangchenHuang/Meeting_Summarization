@@ -117,7 +117,7 @@ def wait_and_validate(args, device_id):
         if i - max_step > 10:
             break
     total_loss_lst = sorted(total_loss_lst, key=lambda x: x[0])[:3]
-    logger.info('PPL %s' % str(total_loss_lst))
+    logger.info('LOSS %s' % str(total_loss_lst))
 
 
 def validate(args, device_id, pt, step):
@@ -165,9 +165,9 @@ def test(args, device_id, pt, step, is_valid=False):
     trainer = build_trainer(args, device_id, model, None)
 
     if args.test_txt:
-        pts = sorted(glob.glob(args.bert_data_path + '/' + '*.pt'))
+        pts = sorted(glob.glob(args.bert_data_path + '*.pt'))
         for pt in pts:
-            id = re.sub(args.bert_data_path + '\\\\test.', '', pt)
+            id = re.sub(args.bert_data_path + 'test.', '', pt)
             id = re.sub('.bert.pt', '', id)
             test_iter = data_loader.Dataloader(args, load_test(pt, 'test'),
                                                args.batch_size, device,
@@ -181,9 +181,9 @@ def test(args, device_id, pt, step, is_valid=False):
             rouge_stat = {}
             for type in rouge_list:
                 rouge_stat[type] = []
-            pts = sorted(glob.glob(args.bert_data_path + '/' + corpus_type + '*.pt'))
+            pts = sorted(glob.glob(args.bert_data_path + corpus_type + '*.pt'))
             for pt in pts:
-                id = re.sub(args.bert_data_path + '\\\\' + corpus_type + '.', '', pt)
+                id = re.sub(args.bert_data_path + corpus_type + '.', '', pt)
                 id = re.sub('.bert.pt', '', id)
                 test_iter = data_loader.Dataloader(args, load_test(pt, corpus_type),
                                                    args.batch_size, device,
@@ -255,11 +255,11 @@ if __name__ == '__main__':
     parser.add_argument("-mode", default='train', type=str, choices=['train', 'validate', 'test'])
     parser.add_argument("-test_txt", type=str2bool, nargs='?', const=False,
                         default=False)  # remember to reset all paths
-    parser.add_argument("-bert_data_path", default='../ext_data/bert_data')
-    parser.add_argument("-model_path", default='../models/extract')
+    parser.add_argument("-bert_data_path", default='../ext_data/bert_data/')
+    parser.add_argument("-model_path", default='../models/extract/')
     parser.add_argument("-result_path", default='../ext_data/summary/')
     parser.add_argument("-story_path", default='../ext_data/result_story/')
-    parser.add_argument("-temp_dir", default='../temp')
+    parser.add_argument("-temp_dir", default='../temp/')
 
     parser.add_argument("-batch_size", default=1000, type=int)
     parser.add_argument("-use_interval", type=str2bool, nargs='?', const=False, default=False)
