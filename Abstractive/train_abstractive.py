@@ -332,9 +332,9 @@ if __name__ == '__main__':
     parser.add_argument("-batch_size", default=200, type=int)
     parser.add_argument("-test_batch_size", default=200, type=int)
 
-    parser.add_argument("-sep_optim", type=str2bool, nargs='?', const=True, default=False)
+    parser.add_argument("-sep_optim", type=str2bool, nargs='?', const=True, default=True)
     parser.add_argument("-lr", default=2e-3, type=float)
-    parser.add_argument("-lr_bert", default=2e-3, type=float)
+    parser.add_argument("-lr_enc", default=2e-3, type=float)
     parser.add_argument("-lr_dec", default=2e-3, type=float)
     parser.add_argument("-use_bert_emb", type=str2bool, nargs='?', const=True, default=True)
     parser.add_argument("-param_init", default=0, type=float)
@@ -361,7 +361,6 @@ if __name__ == '__main__':
     parser.add_argument("-beam_size", default=10, type=int)
     parser.add_argument("-min_length", default=280, type=int)
     parser.add_argument("-max_length", default=400, type=int)
-    parser.add_argument("-max_tgt_len", default=512, type=int)
 
     parser.add_argument("-save_checkpoint_steps", default=500, type=int)
     parser.add_argument("-accum_count", default=5, type=int)

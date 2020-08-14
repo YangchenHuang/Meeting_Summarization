@@ -59,7 +59,7 @@ def build_optim_enc(args, model, checkpoint):
 
     else:
         optim = Optimizer(
-            args.optim, args.lr_bert, args.max_grad_norm,
+            args.optim, args.lr_enc, args.max_grad_norm,
             beta1=args.beta1, beta2=args.beta2,
             decay_method='noam',
             warmup_steps=args.warmup_steps_bert)
