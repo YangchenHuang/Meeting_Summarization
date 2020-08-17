@@ -1,5 +1,12 @@
 ## Abstractive component
 
+In this part, the extracitve summary is fed into an encoder layer (BERT or Longformer) to obtain word representation.
+Taking encoder output and decoder input, the decoder together with the predictor layer are trained to predict the 
+probability distribution of each word in the vocabulary for each position of the output sequence. When doing test,
+a start token is used as the first decoder input and the model will use the output probability distribution to conduct 
+beam search to obtain predicted sequence. When end token is predicted, the model will output the final abstractive 
+summary.
+
 ### Preprocessing
 
 #### Data Paths

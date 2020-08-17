@@ -1,4 +1,13 @@
 ## Extracitve component
+In this part, the preprocessing will first calculate rouge recall for each sentence of a topic, and the rouge recall 
+for each entire topic, and process the story files to torch format files for further training. During training, 
+the preprocessed topics are fed into a BERT layer. The CLS token is used o obtain the sentence representation, and it will
+go through a summarization layer based on transformers to get the probability distribution of choosing each sentence 
+into the summary. Meanwhile, the sentence representation will go through an average pooling layer to get the topic 
+representation, and fed into a weight layer to get the importance weight for each topic. These two layers will be 
+jointly trained and on the test set, the model will choose the top k sentences from each topic, and k is based the topic 
+weight. After reordering these sentences using their position in the original transcript, the model will output the 
+extractive summary.
 
 ### Preprocessing
 

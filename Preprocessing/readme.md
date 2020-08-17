@@ -1,4 +1,11 @@
 ## Preprocessing component
+In this part, the model will first do text preprocessing to remove unrelated or misleading information. 
+Then remove stop words and short sentences are removed when doing clustering.
+We use latent semantic analysis to obtain sentence representations. TF-IDF Vectorizer is used to generate the feature 
+matrix, then SVD is used to reduce the representation dimension. When sentence representation is ready, 
+clustering algorithms can segment each transcript into several clusters. Simple K-means severs as the baseline and 
+equal size clustering is employed so that the model can reach a balance between cluster size and cluster numbers
+
 
 ### Data Paths
 Paths for I/O
