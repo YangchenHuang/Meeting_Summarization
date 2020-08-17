@@ -381,8 +381,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if args.visible_gpus == '' and args.world_size != 0:
-        args.visble_gpus = [str(i) for i in range(args.world_size)]
-        args.visble_gpus = ','.join(args.visble_gpus)
+        args.visible_gpus = [str(i) for i in range(args.world_size)]
+        args.visible_gpus = ','.join(args.visible_gpus)
     if args.gpu_ranks == '' and args.world_size != 0:
         args.gpu_ranks = [str(i) for i in range(args.world_size)]
         args.gpu_ranks = ','.join(args.gpu_ranks)

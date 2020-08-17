@@ -62,7 +62,7 @@ def build_optim_enc(args, model, checkpoint):
             args.optim, args.lr_enc, args.max_grad_norm,
             beta1=args.beta1, beta2=args.beta2,
             decay_method='noam',
-            warmup_steps=args.warmup_steps_bert)
+            warmup_steps=args.warmup_steps_enc)
 
     if args.encoder == 'longformer':
         params = [(n, p) for n, p in list(model.named_parameters()) if n.startswith('longformer.model')]
@@ -103,7 +103,6 @@ def build_optim_dec(args, model, checkpoint):
         params = [(n, p) for n, p in list(model.named_parameters()) if not n.startswith('longformer.model')]
     elif args.encoder == 'bert':
         params = [(n, p) for n, p in list(model.named_parameters()) if not n.startswith('bert.model')]
-    print([n for (n, p) in params])
     optim.set_parameters(params)
 
     return optim
